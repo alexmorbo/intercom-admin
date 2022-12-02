@@ -17,3 +17,9 @@
 .phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+
+.env
+.DS_Store
+/requests/
+src/Provider/Is74
+
