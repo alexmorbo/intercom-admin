@@ -2,11 +2,9 @@
 
 namespace App\Provider;
 
-use Symfony\Component\Serializer\SerializerInterface;
-
 class ProviderRegistry
 {
-    public function __construct(private iterable $providers, private SerializerInterface $serializer)
+    public function __construct(private iterable $providers)
     {
 
     }
@@ -21,7 +19,6 @@ class ProviderRegistry
         /** @var ProviderInterface $provider */
         foreach ($this->providers as $provider) {
             if ($provider->getName() === $providerName) {
-                $provider->setSerializer($this->serializer);
                 return $provider;
             }
         }

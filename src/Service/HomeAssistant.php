@@ -11,6 +11,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 class HomeAssistant
 {
     public const API_NETWORK_INFO = 'http://supervisor/network/info';
+
     private string $path;
 
     public function __construct(

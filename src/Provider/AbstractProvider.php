@@ -4,13 +4,11 @@ namespace App\Provider;
 
 use App\Enum\Provider\AuthScheme;
 use App\Interfaces\ProviderSyncClientInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class AbstractProvider
 {
     protected string $providerName;
     protected AuthScheme $authScheme;
-    protected SerializerInterface $serializer;
     protected ?ProviderSyncClientInterface $syncClient = null;
     protected array $syncClientsForAuth = [];
 

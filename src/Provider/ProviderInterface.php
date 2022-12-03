@@ -13,6 +13,5 @@ interface ProviderInterface
     public function getAuthScheme(): AuthScheme;
     public function formatPhone(string $phone): string;
     public function getAuthDtoClass(): string;
-    public function setSerializer(SerializerInterface $serializer): void;
     public function getSyncClient(?AuthDtoInterface $authDto = null): ProviderSyncClientInterface;
 }

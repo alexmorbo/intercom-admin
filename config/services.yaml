@@ -30,4 +30,5 @@ services:
     App\Provider\ProviderRegistry:
         arguments:
             - !tagged_iterator 'intercom.provider'
-            - '@debug.serializer'
+
+
