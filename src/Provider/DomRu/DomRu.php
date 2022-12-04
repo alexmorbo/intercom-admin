@@ -9,8 +9,8 @@ use App\Interfaces\ProviderSyncClientInterface;
 use App\Provider\AbstractProvider;
 use App\Provider\DomRu\Dto\Auth\AuthDto;
 use App\Provider\ProviderInterface;
-use App\Service\ProviderSerializer;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class DomRu extends AbstractProvider implements ProviderInterface
 {
@@ -38,7 +38,7 @@ class DomRu extends AbstractProvider implements ProviderInterface
 
     public const API_EVENTS = '/rest/v1/events/search?page=0&sort=occurredAt,DESC';
 
-    public function __construct(private ProviderSerializer $serializer)
+    public function __construct(protected SerializerInterface $serializer)
     {
         $this->authScheme = AuthScheme::AddressFirst;
     }
@@ -97,7 +97,7 @@ class DomRu extends AbstractProvider implements ProviderInterface
     {
         if ($this->syncClient === null) {
             $this->syncClient = new Sync($this);
-            $this->syncClient->setSerializer($this->serializer->getSerializer());
+            $this->syncClient->setSerializer($this->getSerializer());
         }
 
         if ($authDto !== null && !isset($this->syncClientsForAuth[$authDto->getAccountId()])) {

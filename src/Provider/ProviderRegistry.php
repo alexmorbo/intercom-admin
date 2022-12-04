@@ -4,12 +4,14 @@ namespace App\Provider;
 
 class ProviderRegistry
 {
-    public function __construct(private iterable $providers)
-    {
+    private array $providers;
 
+    public function __construct(iterable $providers = [])
+    {
+        $this->providers = iterator_to_array($providers);
     }
 
-    public function getProviders(): iterable
+    public function getProviders(): array
     {
         return $this->providers;
     }

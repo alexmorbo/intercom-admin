@@ -31,4 +31,13 @@ services:
         arguments:
             - !tagged_iterator 'intercom.provider'
 
+    provider.registry: '@App\Provider\ProviderRegistry'
+
+    App\Service\HomeAssistant:
+        arguments:
+            - '@provider.registry'
+            - '@serializer'
+            - '@request_stack'
+            - '%kernel.project_dir%'
+
 
