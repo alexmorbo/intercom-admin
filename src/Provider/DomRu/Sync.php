@@ -3,6 +3,7 @@
 namespace App\Provider\DomRu;
 
 use App\Exceptions\ProviderClientException;
+use App\Exceptions\ProviderException;
 use App\Interfaces\Dto\Provider\Auth\AuthDtoInterface;
 use App\Interfaces\Dto\Provider\Auth\RequestConfirmSmsInterface;
 use App\Interfaces\Dto\Provider\Auth\RequestSmsInterface;
@@ -13,7 +14,9 @@ use App\Provider\DomRu\Dto\Auth\AuthDto;
 use App\Provider\DomRu\Dto\Auth\LoginAddress;
 use App\Provider\DomRu\Dto\Place\AccessControl;
 use App\Provider\DomRu\Dto\Place\Camera;
+use App\Provider\DomRu\Dto\Place\CameraVideoStream;
 use App\Provider\DomRu\Dto\Place\Event;
+use App\Provider\DomRu\Dto\Place\RelayOpen;
 use App\Provider\DomRu\Dto\Subscriber\SubscriberPlace;
 use App\Provider\DomRu\Dto\Subscriber\SubscriberProfile;
 use App\Provider\DomRu\Dto\User\UserBalance;
@@ -79,12 +82,12 @@ class Sync implements ProviderSyncClientInterface
         return $headers;
     }
 
-    private function fetchApiWithAuth(string $method, string $url, ?array $data = [], string $fromKey = null): array
+    private function makeRequestWithAuth(string $method, string $url, ?array $data = [])
     {
         $headers = $this->generateHeaders();
 
         try {
-            $response = $this->client->request($method, $url, [
+            return $this->client->request($method, $url, [
                 'headers' => $headers,
                 'json' => $data,
             ]);
@@ -93,9 +96,12 @@ class Sync implements ProviderSyncClientInterface
         } catch (TransportExceptionInterface $e) {
             throw new ProviderClientException($e->getMessage(), $e->getCode(), $e);
         }
+    }
 
+    private function fetchApiWithAuth(string $method, string $url, ?array $data = [], string $fromKey = null): array
+    {
         try {
-            $content = $response->getContent();
+            $content = $this->makeRequestWithAuth($method, $url, $data)->getContent(false);
             $data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             throw new ProviderClientException($e->getMessage(), $e->getCode(), $e);
@@ -328,11 +334,6 @@ class Sync implements ProviderSyncClientInterface
         }
     }
 
-    public function fetchCameras(): Generator
-    {
-
-    }
-
     public function fetchPublicCameras(int $placeId): Generator
     {
         $data = $this->fetchApiWithAuth(
@@ -354,6 +355,54 @@ class Sync implements ProviderSyncClientInterface
         }
     }
 
+    public function getCameraSnapshot(int $cameraId): string
+    {
+        return $this->makeRequestWithAuth(
+            'GET',
+            $this->provider::BASE_API_DOMAIN . sprintf($this->provider::API_CAMERA_SNAPSHOT, $cameraId),
+        )->getContent();
+    }
+
+    public function getCameraVideoStream(int $cameraId): CameraVideoStream
+    {
+        $data = $this->fetchApiWithAuth(
+            'GET',
+            $this->provider::BASE_API_DOMAIN . sprintf($this->provider::API_CAMERA_VIDEO_STREAM, $cameraId),
+        );
+
+        return $this->serializer->denormalize(
+            $data['data'] ?? $data,
+            CameraVideoStream::class,
+            null,
+            [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true]
+        );
+    }
+
+    public function openRelay(int $placeId, int $relayId): bool
+    {
+        $data = $this->fetchApiWithAuth(
+            'POST',
+            $this->provider::BASE_API_DOMAIN . sprintf($this->provider::API_RELAY_OPEN, $placeId, $relayId),
+            [
+                'name' => 'accessControlOpen'
+            ]
+        );
+
+        /** @var RelayOpen $opened */
+        $opened = $this->serializer->denormalize(
+            $data['data'] ?? $data,
+            RelayOpen::class,
+            null,
+            [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true]
+        );
+
+        if ($opened->status !== true) {
+            throw new ProviderException($opened->errorMessage, $opened->errorCode);
+        }
+
+        return true;
+    }
+
     private function fetchSipDevices()
     {
         return $this->serializer->denormalize(
@@ -371,15 +420,15 @@ class Sync implements ProviderSyncClientInterface
 
     public function getRelays(): Generator
     {
-        foreach ($this->fet as $relayData) {
-            $relay = $this->serializer->denormalize(
-                $relayData,
-                Relay::class,
-                null,
-                [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true]
-            );
-
-            yield $relay;
-        }
+//        foreach ($this->fet as $relayData) {
+//            $relay = $this->serializer->denormalize(
+//                $relayData,
+//                Relay::class,
+//                null,
+//                [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true]
+//            );
+//
+//            yield $relay;
+//        }
     }
 }

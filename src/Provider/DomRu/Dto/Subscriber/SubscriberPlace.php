@@ -28,5 +28,5 @@ class SubscriberPlace
     /**
      * @var array <Camera>
      */
-    public array $cameras;
+    public array $cameras = [];
 }

@@ -3,14 +3,18 @@
 namespace App\Provider\DomRu\Dto\Auth;
 
 use App\Interfaces\Dto\Provider\Auth\AuthDtoInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 class AuthDto implements AuthDtoInterface
 {
+    #[Groups(['publicApi'])]
     public string $deviceId;
+    #[Groups(['publicApi'])]
     public int $operatorId;
     public string $accountId;
     public string $operatorName;
     public string $tokenType;
+    #[Groups(['publicApi'])]
     public string $accessToken;
     public mixed $expiresIn;
     public string $refreshToken;

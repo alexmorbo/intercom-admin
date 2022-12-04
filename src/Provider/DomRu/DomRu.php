@@ -38,6 +38,12 @@ class DomRu extends AbstractProvider implements ProviderInterface
 
     public const API_EVENTS = '/rest/v1/events/search?page=0&sort=occurredAt,DESC';
 
+    public const API_CAMERA_SNAPSHOT = '/rest/v1/forpost/cameras/%d/snapshots';
+
+    public const API_CAMERA_VIDEO_STREAM = '/rest/v1/forpost/cameras/%d/video';
+
+    public const API_RELAY_OPEN = '/rest/v1/places/%d/accesscontrols/%d/actions';
+
     public function __construct(protected SerializerInterface $serializer)
     {
         $this->authScheme = AuthScheme::AddressFirst;
