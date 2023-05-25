@@ -3,28 +3,34 @@
 namespace App\Provider\DomRu\Dto\Auth;
 
 use App\Interfaces\Dto\Provider\Auth\AuthDtoInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
+use App\Provider\DomRu\DomRu;
 
 class AuthDto implements AuthDtoInterface
 {
-    #[Groups(['publicApi'])]
-    public string $deviceId;
-    #[Groups(['publicApi'])]
+    public const PROVIDER_CLASS = DomRu::class;
+
+    public ?string $deviceId = null;
+    public ?string $phone = null;
+    public ?string $accountId = null;
     public int $operatorId;
-    public string $accountId;
     public string $operatorName;
     public string $tokenType;
-    #[Groups(['publicApi'])]
     public string $accessToken;
     public mixed $expiresIn;
     public string $refreshToken;
     public mixed $refreshExpiresIn;
 
+    public function getProviderClass(): string
+    {
+        return self::PROVIDER_CLASS;
+    }
+
     public function populate(array $data): self
     {
         $this->deviceId = $data['deviceId'];
-        $this->operatorId = $data['operatorId'];
+        $this->phone = $data['phone'];
         $this->accountId = $data['accountId'];
+        $this->operatorId = $data['operatorId'];
         $this->operatorName = $data['operatorName'];
         $this->tokenType = $data['tokenType'];
         $this->accessToken = $data['accessToken'];
@@ -40,12 +46,13 @@ class AuthDto implements AuthDtoInterface
         return $this->accountId;
     }
 
-    public function toArray(): array
+    public function __toArray(): array
     {
         return [
             'deviceId' => $this->deviceId,
-            'operatorId' => $this->operatorId,
+            'phone' => $this->phone,
             'accountId' => $this->accountId,
+            'operatorId' => $this->operatorId,
             'operatorName' => $this->operatorName,
             'tokenType' => $this->tokenType,
             'accessToken' => $this->accessToken,

@@ -4,8 +4,8 @@ namespace App\Command;
 
 use App\Enum\Provider\AuthScheme;
 use App\Exceptions\ProviderClientException;
-use App\Provider\DomRu\Dto\Auth\RequestConfirmSms;
 use App\Provider\DomRu\Dto\Auth\RequestSms;
+use App\Provider\DomRu\Dto\Request\RequestConfirmSms;
 use App\Provider\ProviderRegistry;
 use App\Service\HomeAssistant;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -111,8 +111,6 @@ class AccountAddCommand extends Command
                         'confirm1' => $confirmationCode,
                     ])
                 );
-
-                dump($authDto);
 
                 if ($this->homeAssistant->saveProviderAuthData($provider, $authDto)) {
                     $io->success('Account added');

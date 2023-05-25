@@ -23,6 +23,9 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    provider.hydarator: '@App\Hydrator\ProviderHydrator'
+    provider.cache: '@App\Provider\ProviderCache'
+
     _instanceof:
         App\Provider\ProviderInterface:
             tags: [ 'intercom.provider' ]
@@ -30,6 +33,8 @@ services:
     App\Provider\ProviderRegistry:
         arguments:
             - !tagged_iterator 'intercom.provider'
+            - '@provider.hydarator'
+            - '@provider.cache'
 
     provider.registry: '@App\Provider\ProviderRegistry'
 

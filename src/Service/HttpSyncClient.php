@@ -11,7 +11,9 @@ class HttpSyncClient
 
     public function __construct()
     {
-        $this->client = HttpClient::create();
+        $this->client = HttpClient::create([
+            'proxy' => 'http://10.30.29.1:9090',
+        ]);
     }
 
     public function getClient(): HttpClientInterface
